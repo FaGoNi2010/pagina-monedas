@@ -1,59 +1,59 @@
 const container = document.getElementById("coins-container");
 const fullscreenZone = document.getElementById("fullscreen-zone");
 
-/* ========= CREAR MONEDAS ========= */
+let coins = [];
+let lastTap = 0;
 
+/* CREAR MONEDA */
 function createCoin(x, y) {
     const coin = document.createElement("div");
     coin.classList.add("coin");
 
-    coin.style.left = x + "px";
-    coin.style.top = y + "px";
+    const size = window.innerWidth * 0.22;
 
-    /* CLICK PC = borrar */
-    coin.addEventListener("click", () => {
-        coin.remove();
-    });
-
-    /* TOUCH CELULAR = borrar SOLO si es TAP (no slide) */
-    let touchMoved = false;
-
-    coin.addEventListener("touchstart", () => {
-        touchMoved = false;
-    });
-
-    coin.addEventListener("touchmove", () => {
-        touchMoved = true;
-    });
-
-    coin.addEventListener("touchend", () => {
-        if (!touchMoved) {
-            coin.remove();
-        }
-    });
+    coin.style.left = (x - size/2) + "px";
+    coin.style.top = (y - size/2) + "px";
 
     container.appendChild(coin);
+    coins.push(coin);
 }
 
-/* ========= CLICK PARA CREAR ========= */
-
-document.addEventListener("click", (e) => {
-    createCoin(e.clientX - 45, e.clientY - 45);
-});
-
-/* ========= TOUCH PARA CREAR ========= */
-
-document.addEventListener("touchstart", (e) => {
+/* TAP CREAR MONEDA */
+document.addEventListener("touchstart", e => {
     const touch = e.touches[0];
-    createCoin(touch.clientX - 45, touch.clientY - 45);
+    createCoin(touch.clientX, touch.clientY);
 });
 
-/* ========= FULLSCREEN DOBLE CLICK ESQUINA ========= */
+/* DESLIZAR BORRAR */
+document.addEventListener("touchmove", e => {
+    const touch = e.touches[0];
 
-fullscreenZone.addEventListener("dblclick", () => {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else {
-        document.exitFullscreen();
+    coins.forEach((coin, i) => {
+        const rect = coin.getBoundingClientRect();
+
+        if (
+            touch.clientX > rect.left &&
+            touch.clientX < rect.right &&
+            touch.clientY > rect.top &&
+            touch.clientY < rect.bottom
+        ) {
+            coin.remove();
+            coins.splice(i, 1);
+        }
+    });
+});
+
+/* DOBLE TAP FULLSCREEN */
+fullscreenZone.addEventListener("touchend", () => {
+    const now = Date.now();
+
+    if (now - lastTap < 300) {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
     }
+
+    lastTap = now;
 });

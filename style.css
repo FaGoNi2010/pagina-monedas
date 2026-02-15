@@ -1,44 +1,43 @@
 body {
-    margin: 0;
-    overflow: hidden;
-    background: radial-gradient(circle, #1a1a1a, #000);
-    font-family: Arial, sans-serif;
+margin: 0;
+overflow: hidden;
+background: black;
+touch-action: none;
 }
 
-/* Zona invisible arriba izquierda para doble click fullscreen */
+/* Zona fullscreen */
 #fullscreen-zone {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 120px;
-    height: 120px;
-    z-index: 1000;
+position: fixed;
+top: 0;
+left: 0;
+width: 30vw;
+height: 30vh;
+z-index: 1000;
 }
 
-/* Contenedor monedas */
 #coins-container {
-    position: fixed;
-    width: 100%;
-    height: 100%;
+position: fixed;
+width: 100%;
+height: 100%;
 }
 
-/* MONEDAS MÁS GRANDES */
+/* MONEDAS GRANDES CELULAR */
 .coin {
-    position: absolute;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #fff8b0, #d4af37, #8b6f1a);
-    box-shadow:
-        inset -4px -4px 10px rgba(0,0,0,0.6),
-        inset 4px 4px 10px rgba(255,255,255,0.4),
-        0 0 15px rgba(255,215,0,0.4);
-    cursor: pointer;
-    user-select: none;
-    touch-action: none;
-    transition: transform 0.15s;
-}
+position: absolute;
+width: 22vw;
+height: 22vw;
+max-width: 160px;
+max-height: 160px;
+border-radius: 50%;
 
-.coin:active {
-    transform: scale(0.9);
+background: radial-gradient(circle at 30% 30%, #eee, #bbb, #777);
+
+border: 4px solid #ddd;
+
+box-shadow:
+inset -8px -8px 16px rgba(0,0,0,0.6),
+inset 8px 8px 16px rgba(255,255,255,0.4),
+0 0 25px rgba(255,255,255,0.3);
+
+pointer-events: none;
 }
