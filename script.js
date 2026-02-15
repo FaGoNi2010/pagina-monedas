@@ -1,59 +1,86 @@
-const container = document.getElementById("coins-container");
-const fullscreenZone = document.getElementById("fullscreen-zone");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-let coins = [];
-let lastTap = 0;
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-/* CREAR MONEDA */
-function createCoin(x, y) {
-    const coin = document.createElement("div");
-    coin.classList.add("coin");
-
-    const size = window.innerWidth * 0.22;
-
-    coin.style.left = (x - size/2) + "px";
-    coin.style.top = (y - size/2) + "px";
-
-    container.appendChild(coin);
-    coins.push(coin);
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 
-/* TAP CREAR MONEDA */
-document.addEventListener("touchstart", e => {
+let coins = [];
+
+/* ===== CREAR MONEDA ===== */
+function createCoin(x, y) {
+    coins.push({
+        x: x,
+        y: y,
+        size: 70 + Math.random() * 20, // grandes para celular
+        rotation: Math.random() * Math.PI
+    });
+}
+
+/* ===== DIBUJAR ===== */
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    coins.forEach(c => {
+
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rotation);
+
+        // borde plateado
+        ctx.beginPath();
+        ctx.arc(0, 0, c.size, 0, Math.PI * 2);
+        ctx.fillStyle = "#c0c0c0";
+        ctx.fill();
+
+        // centro
+        ctx.beginPath();
+        ctx.arc(0, 0, c.size * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = "#e0e0e0";
+        ctx.fill();
+
+        // aro interior
+        ctx.beginPath();
+        ctx.arc(0, 0, c.size * 0.5, 0, Math.PI * 2);
+        ctx.strokeStyle = "#aaaaaa";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.restore();
+
+        c.rotation += 0.02;
+    });
+
+    requestAnimationFrame(draw);
+}
+draw();
+
+/* ===== TAP = CREAR ===== */
+canvas.addEventListener("touchstart", e => {
     const touch = e.touches[0];
     createCoin(touch.clientX, touch.clientY);
 });
 
-/* DESLIZAR BORRAR */
-document.addEventListener("touchmove", e => {
+/* ===== DESLIZAR = BORRAR SOLO UNA ===== */
+canvas.addEventListener("touchmove", e => {
     const touch = e.touches[0];
+    const x = touch.clientX;
+    const y = touch.clientY;
 
-    coins.forEach((coin, i) => {
-        const rect = coin.getBoundingClientRect();
+    // buscar moneda tocada
+    for (let i = coins.length - 1; i >= 0; i--) {
+        let c = coins[i];
+        let dx = x - c.x;
+        let dy = y - c.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (
-            touch.clientX > rect.left &&
-            touch.clientX < rect.right &&
-            touch.clientY > rect.top &&
-            touch.clientY < rect.bottom
-        ) {
-            coin.remove();
+        if (dist < c.size) {
             coins.splice(i, 1);
-        }
-    });
-});
-
-/* DOBLE TAP FULLSCREEN */
-fullscreenZone.addEventListener("touchend", () => {
-    const now = Date.now();
-
-    if (now - lastTap < 300) {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            document.exitFullscreen();
+            break;
         }
     }
-
-    lastTap = now;
 });
